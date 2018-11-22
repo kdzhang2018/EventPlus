@@ -5,6 +5,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -15,12 +16,13 @@ import org.json.JSONObject;
 import entity.Item;
 import entity.Item.ItemBuilder;
 
-public class TicketMasterAPI {
+public class TicketMasterAPI implements ExternalAPI {
 	private static final String API_HOST = "app.ticketmaster.com";
 	private static final String SEARCH_PATH = "/discovery/v2/events.json";
 	private static final String DEFAULT_TERM = "";  // no restriction
 	private static final String API_KEY = "FZ1vSXD9TciHPyE0KL9G2HKi6skXFO1c";
 
+	@Override
 	public List<Item> search(double lat, double lon, String term) {
 		// create a base url, based on API_HOST and SEARCH_PATH
 		String url = "http://" + API_HOST + SEARCH_PATH;
@@ -63,7 +65,7 @@ public class TicketMasterAPI {
 		}
 		return null;
 	}
-	
+
 	private String urlEncodeHelper(String term) {
 		try {
 			term = java.net.URLEncoder.encode(term, "UTF-8");
@@ -84,7 +86,7 @@ public class TicketMasterAPI {
 			e.printStackTrace();
 		}
 	}
-	
+
 	/**
 	 * Helper methods
 	 */
@@ -159,7 +161,13 @@ public class TicketMasterAPI {
 	}
 
 	private String getImageUrl(JSONObject event) throws JSONException {
-                             // Get from “image” field
+		// Get from “image” field
+		if (!event.isNull("images")) {
+			JSONArray imagesArray = event.getJSONArray("images");
+			if (imagesArray.length() >= 1) {
+				return getStringFieldOrNull(imagesArray.getJSONObject(0), "url" );
+			}
+		}
 		return null;
 	}
 
@@ -177,8 +185,15 @@ public class TicketMasterAPI {
 	}
 
 	private Set<String> getCategories(JSONObject event) throws JSONException {
-                             // Get from “classifications” => “segment” => “name”
-		return null;
+		// Get from “classifications” => “segment” => “name”
+		Set<String> categories = new HashSet<>();
+		JSONArray classifications = (JSONArray) event.get("classifications");
+		for (int j = 0; j < classifications.length(); j++) {
+			JSONObject classification = classifications.getJSONObject(j);
+			JSONObject segment = classification.getJSONObject("segment");
+			categories.add(segment.getString("name"));
+		}
+		return categories;
 	}
 
 	private String getStringFieldOrNull(JSONObject event, String field) throws JSONException {
@@ -195,7 +210,7 @@ public class TicketMasterAPI {
 	public static void main(String[] args) {
 		TicketMasterAPI tmApi = new TicketMasterAPI();
 		// Mountain View, CA
-	              tmApi.queryAPI(37.38, -122.08);
+		tmApi.queryAPI(37.38, -122.08);
 	}
 
 
