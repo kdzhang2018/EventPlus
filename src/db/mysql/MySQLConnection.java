@@ -10,15 +10,24 @@ import java.util.List;
 import java.util.Set;
 
 import db.DBConnection;
+import db.mongodb.MongoDBConnection;
 import entity.Item;
 import entity.Item.ItemBuilder;
 import external.ExternalAPI;
 import external.ExternalAPIFactory;
 
 public class MySQLConnection implements DBConnection{
+	private static MySQLConnection instance;
 	private Connection conn;
-
-	public MySQLConnection() {
+	
+	public static DBConnection getInstance() {
+		if (instance == null) {
+			instance = new MySQLConnection();
+		}
+		return instance;
+	}
+	
+	private MySQLConnection() {
 		try {
 			Class.forName("com.mysql.jdbc.Driver").newInstance();
 			conn = DriverManager.getConnection(MySQLDBUtil.URL);
