@@ -43,7 +43,7 @@ public class MongoDBConnection implements DBConnection {
 		if (mongoClient != null) {
 			mongoClient.close();
 		}
-		
+
 	}
 
 	@Override
@@ -132,27 +132,32 @@ public class MongoDBConnection implements DBConnection {
 		db.getCollection("items").updateOne(new Document().append("item_id", item.getItemId()),
 				new Document("$set",
 						new Document().append("item_id", item.getItemId()).append("name", item.getName())
-								.append("city", item.getCity()).append("state", item.getState())
-								.append("country", item.getCountry()).append("zip_code", item.getZipcode())
-								.append("rating", item.getRating()).append("address", item.getAddress())
-								.append("latitude", item.getLatitude()).append("longitude", item.getLongitude())
-								.append("description", item.getDescription()).append("snippet", item.getSnippet())
-								.append("snippet_url", item.getSnippetUrl()).append("image_url", item.getImageUrl())
-								.append("url", item.getUrl()).append("categories", item.getCategories())),
+						.append("city", item.getCity()).append("state", item.getState())
+						.append("country", item.getCountry()).append("zip_code", item.getZipcode())
+						.append("rating", item.getRating()).append("address", item.getAddress())
+						.append("latitude", item.getLatitude()).append("longitude", item.getLongitude())
+						.append("description", item.getDescription()).append("snippet", item.getSnippet())
+						.append("snippet_url", item.getSnippetUrl()).append("image_url", item.getImageUrl())
+						.append("url", item.getUrl()).append("categories", item.getCategories())),
 				options);
 
 	}
 
 	@Override
 	public String getFullname(String userId) {
-		// TODO Auto-generated method stub
-		return null;
+		FindIterable<Document> iterable =db.getCollection("users").find(new Document("user_id", userId));
+		Document document = iterable.first();
+		String firstName = document.getString("first_name");
+		String lastName = document.getString("last_name");
+		return firstName + " " + lastName;
 	}
 
 	@Override
 	public boolean verifyLogin(String userId, String password) {
-		// TODO Auto-generated method stub
-		return false;
+		FindIterable<Document> iterable = db.getCollection("users").find(new Document("user_id", userId));		
+		Document document = iterable.first();
+		return document.getString("password").equals(password);
+
 	}
 
 }
