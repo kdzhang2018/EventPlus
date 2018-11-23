@@ -182,7 +182,7 @@
            activeBtn('nearby-btn');
   
            // The request parameters
-           var url = 'http://localhost:8080/EventPlus/search';
+           var url = './search';
            var params = 'user_id=' + user_id + '&lat=' + lat + '&lon=' + lng;
            var req = JSON.stringify({});
   
@@ -214,7 +214,7 @@
            activeBtn('fav-btn');
   
            // The request parameters
-           var url = 'http://localhost:8080/EventPlus/history';
+           var url = './history';
            var params = 'user_id=' + user_id;
            var req = JSON.stringify({});
   
@@ -242,7 +242,7 @@
            activeBtn('recommend-btn');
   
            // The request parameters
-           var url = 'http://localhost:8080/EventPlus/recomendation';
+           var url = './recommendation';
            var params = 'user_id=' + user_id + '&lat=' + lat + '&lon=' + lng;
   
            var req = JSON.stringify({});
@@ -286,7 +286,7 @@
            var favorite = li.dataset.favorite !== 'true';
   
            // The request parameters
-           var url = 'http://www.mocky.io/v2/5a2462462e0000570f83bf99';
+           var url = './history';
            var req = JSON.stringify({
                user_id : user_id,
                favorite : [ item_id ]
